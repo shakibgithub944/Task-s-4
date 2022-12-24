@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 const Identity = () => {
+    const [Sectors, setSectors] = useState([])
+
+    const [name, setName] = useState('')
+    const [sector, setSector] = useState('')
     const [checked, setChecked] = useState(false)
-    const [Sectors, setSector] = useState([])
+
     const [edit, setEdit] = useState({})
     const [id, setId] = useState('')
 
@@ -10,21 +14,24 @@ const Identity = () => {
         fetch('http://localhost:5000/sector')
             .then(res => res.json())
             .then(data => {
-                setSector(data);
+                setSectors(data);
             })
 
     }, [])
 
+    // console.log(name, sector, checked);
+
     const handleFormDetails = (e) => {
         e.preventDefault()
-        const form = e.target;
-        const name = form.name.value;
-        const sector = form.sector.value;
+        // const form = e.target;
+        // const name = form.name.value;
+        // const sector = form.sector.value;
         const user = {
             name,
             sector,
             AgreeToTerms: checked
         }
+        console.log(user);
 
         fetch(`http://localhost:5000/user`, {
             method: 'POST',
@@ -42,16 +49,18 @@ const Identity = () => {
                     .then(data => {
                         // console.log(data);
                         setEdit(data)
+                        alert(' Successfully user added')
                     })
 
             })
     }
 
+
     const handleUpdateDetails = (e) => {
         e.preventDefault()
-        const form = e.target;
-        const name = form.name.value;
-        const sector = form.sector.value;
+        // const form = e.target;
+        // const name = form.name.value;
+        // const sector = form.sector.value;
         const user = {
             name,
             sector,
@@ -69,6 +78,15 @@ const Identity = () => {
             .then(res => res.json())
             .then(data => {
                 console.log(data);
+                if (data.acknowledged) {
+                    alert('Your Profile updated')
+                    setName('')
+                    setSector('')
+                    setChecked(false)
+                }
+            })
+            .catch(err => {
+                alert('before update you need to saved it.')
             })
 
     }
@@ -78,14 +96,16 @@ const Identity = () => {
         <div className='form'>
             {/* <h3>Please enter your name and pick the Sectors you are currently involved in.</h3> */}
             <div className=''>
-                <form onSubmit={handleFormDetails}>
+                <div >
 
                     <label htmlFor="fname">Name:</label><br />
-                    <input type="text" id="name" name="name" required /><br />
+                    <input type="text" defaultValue={edit.name} onChange={(e) => setName(e.target.value)} id="name" name="name" required /><br />
 
                     <label htmlFor="cars">Sectors:</label>
-                    <select id="cars" name="sector">
-
+                    <select id="cars" name="sector" onChange={(e) => setSector(e.target.value)} >
+                        {
+                            edit && <option>{edit.sector}</option>
+                        }
                         {
                             Sectors.map((sector, idx) => <option key={idx}>{sector.sector}</option>)
                         }
@@ -93,11 +113,12 @@ const Identity = () => {
 
                     <input type="checkbox" onChange={(e) => setChecked(e.target.checked)} id="vehicle1" name="check" checked={checked} />
                     <label htmlFor="vehicle1">Agree to terms</label><br />
-                    <input type="submit" disabled={!checked} value="Save" />
-                </form>
+                    <input type="submit" onClick={handleFormDetails} disabled={!checked} value="Save" />
+                    <input type="submit" onClick={handleUpdateDetails} disabled={!checked} value="Update" />
+                </div>
             </div>
 
-            <div className=''>
+            {/* <div className=''>
                 <form onSubmit={handleUpdateDetails} >
 
                     <label htmlFor="fname">Name:</label><br />
@@ -115,7 +136,7 @@ const Identity = () => {
                     <label htmlFor="vehicle1">Agree to terms</label><br />
                     <input type="submit" value="Update" />
                 </form>
-            </div>
+            </div> */}
 
         </div>
     );
