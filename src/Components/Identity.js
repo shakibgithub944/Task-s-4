@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast'
 
 const Identity = () => {
     const [Sectors, setSectors] = useState([])
@@ -7,11 +8,11 @@ const Identity = () => {
     const [sector, setSector] = useState('')
     const [checked, setChecked] = useState(false)
 
-    const [edit, setEdit] = useState({})
+    const [edit, setEdit] = useState('')
     const [id, setId] = useState('')
 
     useEffect(() => {
-        fetch('http://localhost:5000/sector')
+        fetch('https://task-s-4-server.vercel.app/sector')
             .then(res => res.json())
             .then(data => {
                 setSectors(data);
@@ -19,21 +20,19 @@ const Identity = () => {
 
     }, [])
 
-    // console.log(name, sector, checked);
-
     const handleFormDetails = (e) => {
-        e.preventDefault()
-        // const form = e.target;
-        // const name = form.name.value;
-        // const sector = form.sector.value;
+
+        if (name === '' || sector === '') {
+            return toast.error('Please fill up all input.')
+
+        }
         const user = {
             name,
             sector,
             AgreeToTerms: checked
         }
-        console.log(user);
 
-        fetch(`http://localhost:5000/user`, {
+        fetch(`https://task-s-4-server.vercel.app/user`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -42,33 +41,30 @@ const Identity = () => {
         })
             .then(res => res.json())
             .then(data => {
-                // console.log(data);
                 setId(data.insertedId)
-                fetch(`http://localhost:5000/editUser/${data.insertedId}`)
+                fetch(`https://task-s-4-server.vercel.app/editUser/${data.insertedId}`)
                     .then(res => res.json())
                     .then(data => {
-                        // console.log(data);
                         setEdit(data)
-                        alert(' Successfully user added')
+                        toast.success('Request Successfull.')
                     })
 
             })
     }
 
-
     const handleUpdateDetails = (e) => {
-        e.preventDefault()
-        // const form = e.target;
-        // const name = form.name.value;
-        // const sector = form.sector.value;
+
+        if (name === '' || sector === '') {
+            return toast.error('Please fill up all input.')
+
+        }
         const user = {
             name,
             sector,
             AgreeToTerms: checked
         }
-        console.log(user);
 
-        fetch(`http://localhost:5000/UpdatedUser/${id}`, {
+        fetch(`https://task-s-4-server.vercel.app/UpdatedUser/${id}`, {
             method: 'PUT',
             headers: {
                 'content-type': 'application/json'
@@ -77,32 +73,29 @@ const Identity = () => {
         })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 if (data.acknowledged) {
-                    alert('Your Profile updated')
-                    setName('')
-                    setSector('')
+                    toast.success('Information Updated.')
                     setChecked(false)
                 }
             })
             .catch(err => {
-                alert('before update you need to saved it.')
+                toast.error('Before update you need to saved it.')
             })
 
     }
 
-
     return (
-        <div className='form'>
-            {/* <h3>Please enter your name and pick the Sectors you are currently involved in.</h3> */}
-            <div className=''>
-                <div >
+        <div className='Page'>
+            <div className='form'>
+                <h3>Please enter your name and pick the Sectors you are currently involved in.</h3>
+                <div>
 
-                    <label htmlFor="fname">Name:</label><br />
-                    <input type="text" defaultValue={edit.name} onChange={(e) => setName(e.target.value)} id="name" name="name" required /><br />
+                    <label htmlFor="name">Name:</label><br />
+                    <input className='input-item' type="text" defaultValue={edit.name} onChange={(e) => setName(e.target.value)} id="name" name="name" required /><br />
 
-                    <label htmlFor="cars">Sectors:</label>
-                    <select id="cars" name="sector" onChange={(e) => setSector(e.target.value)} >
+                    <label htmlFor="">Sectors:</label>
+                    <select className='input-item' name="sector" onChange={(e) => setSector(e.target.value)} >
+                        <option className='option' value="">Please select a sector</option>
                         {
                             edit && <option>{edit.sector}</option>
                         }
@@ -111,33 +104,12 @@ const Identity = () => {
                         }
                     </select> <br />
 
-                    <input type="checkbox" onChange={(e) => setChecked(e.target.checked)} id="vehicle1" name="check" checked={checked} />
+                    <input className='check-box' type="checkbox" onChange={(e) => setChecked(e.target.checked)} id="vehicle1" name="check" checked={checked} />
                     <label htmlFor="vehicle1">Agree to terms</label><br />
-                    <input type="submit" onClick={handleFormDetails} disabled={!checked} value="Save" />
-                    <input type="submit" onClick={handleUpdateDetails} disabled={!checked} value="Update" />
+                    <input className='btn' type="submit" onClick={handleFormDetails} disabled={!checked} value="Save" />
+                    <input className='btn' type="submit" onClick={handleUpdateDetails} disabled={!checked} value="Update" />
                 </div>
             </div>
-
-            {/* <div className=''>
-                <form onSubmit={handleUpdateDetails} >
-
-                    <label htmlFor="fname">Name:</label><br />
-                    <input type="text" defaultValue={edit.name} id="name" name="name" required /><br />
-
-                    <label htmlFor="cars">Sectors:</label>
-                    <select id="cars" name="sector">
-                        <option>{edit.sector}</option>
-                        {
-                            Sectors.map((sector, idx) => <option key={idx}>{sector.sector}</option>)
-                        }
-                    </select> <br />
-
-                    <input type="checkbox" onChange={(e) => setChecked(e.target.checked)} id="vehicle1" name="check" checked={checked} />
-                    <label htmlFor="vehicle1">Agree to terms</label><br />
-                    <input type="submit" value="Update" />
-                </form>
-            </div> */}
-
         </div>
     );
 };

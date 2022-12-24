@@ -1,6 +1,33 @@
-.form{
+.Page {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100vh;
+}
+
+.form {
+    border: 1px solid yellowgreen;
+    /* height: 60vh; */
+    width: 50vh;
+    padding: 20px;
+    background-color: yellowgreen;
+    color: white;
+    border-radius: 10px;
+}
+
+.input-item {
+    height: 20px;
+    width: 100%;
+}
+
+.btn {
+    width: 80px;
+    padding: 5px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-right: 10px;
+}
+
+.check-box {
+    margin-top: 20px;
 }
